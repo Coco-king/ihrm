@@ -2,9 +2,7 @@ package top.codecrab.system.base;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import top.codecrab.common.utils.IdWorker;
-import top.codecrab.system.repository.PermissionRepository;
-import top.codecrab.system.repository.RoleRepository;
-import top.codecrab.system.repository.UserRepository;
+import top.codecrab.system.repository.*;
 
 /**
  * @author codecrab
@@ -23,4 +21,10 @@ public class BaseService {
     protected RoleRepository roleRepository;
     @Autowired
     protected PermissionRepository permissionRepository;
+    @Autowired
+    protected PermissionMenuRepository permissionMenuRepository;
+    @Autowired
+    protected PermissionPointRepository permissionPointRepository;
+    @Autowired
+    protected PermissionApiRepository permissionApiRepository;
 }

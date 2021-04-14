@@ -1,6 +1,7 @@
 package top.codecrab.common.entity.system;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

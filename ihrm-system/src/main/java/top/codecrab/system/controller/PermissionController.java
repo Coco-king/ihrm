@@ -7,6 +7,7 @@ import top.codecrab.common.response.ResultCode;
 import top.codecrab.system.base.BaseController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author codecrab
@@ -16,37 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/sys/permission")
 public class PermissionController extends BaseController {
-
-    @PostMapping
-    public Result add(@RequestBody Permission permission) {
-        permissionService.save(permission);
-        return Result.success();
-    }
-
-    @PutMapping("/{id}")
-    public Result update(
-            @PathVariable(name = "id") String id,
-            @RequestBody Permission permission
-    ) {
-        permission.setId(id);
-        boolean update = permissionService.update(permission);
-        return update ? Result.success() : Result.fail();
-    }
-
-    @DeleteMapping("/{id}")
-    public Result delete(@PathVariable(name = "id") String id) {
-        permissionService.delete(id);
-        return Result.success();
-    }
-
-    /**
-     * 根据ID获取角色信息
-     */
-    @GetMapping("/{id}")
-    public Result findById(@PathVariable(name = "id") String id) {
-        Permission permission = permissionService.findById(id);
-        return new Result(ResultCode.SUCCESS, permission);
-    }
 
     /**
      * 分页查询角色
@@ -58,5 +28,36 @@ public class PermissionController extends BaseController {
     ) {
         List<Permission> searchPage = permissionService.findAll(type, pid);
         return new Result(ResultCode.SUCCESS, searchPage);
+    }
+
+    /**
+     * 根据ID获取角色信息
+     */
+    @GetMapping("/{id}")
+    public Result findById(@PathVariable(name = "id") String id) {
+        Object permission = permissionService.findById(id);
+        return new Result(ResultCode.SUCCESS, permission);
+    }
+
+    @PostMapping
+    public Result save(@RequestBody Map<String, Object> map) {
+        permissionService.save(map);
+        return Result.success();
+    }
+
+    @PutMapping("/{id}")
+    public Result update(
+            @PathVariable(name = "id") String id,
+            @RequestBody Map<String, Object> map
+    ) {
+        map.put("id", id);
+        boolean update = permissionService.update(map);
+        return update ? Result.success() : Result.fail();
+    }
+
+    @DeleteMapping("/{id}")
+    public Result delete(@PathVariable(name = "id") String id) {
+        permissionService.delete(id);
+        return Result.success();
     }
 }

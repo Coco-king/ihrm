@@ -1,5 +1,6 @@
 package top.codecrab.common.entity.system;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -48,6 +49,7 @@ public class Permission implements Serializable {
     private String description;
 
     @Column(name = "pid")
+    @JsonAlias("pid")
     private String parentId;
 
     private Integer enVisible;

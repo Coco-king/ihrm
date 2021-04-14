@@ -3,6 +3,7 @@ package top.codecrab.system.service;
 import top.codecrab.common.entity.system.Permission;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author codecrab
@@ -26,22 +27,22 @@ public interface PermissionService {
      * @param id 权限id
      * @return 权限
      */
-    Permission findById(String id);
+    Object findById(String id);
 
     /**
      * 保存权限
      *
-     * @param role 权限
+     * @param map 权限信息
      */
-    void save(Permission role);
+    void save(Map<String, Object> map);
 
     /**
      * 根据id修改权限
      *
-     * @param role 权限
+     * @param map 权限
      * @return 是否成功
      */
-    boolean update(Permission role);
+    boolean update(Map<String, Object> map);
 
     /**
      * 根据id删除权限
