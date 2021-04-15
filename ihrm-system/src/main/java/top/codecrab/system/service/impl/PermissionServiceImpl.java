@@ -12,12 +12,11 @@ import top.codecrab.common.entity.system.PermissionPoint;
 import top.codecrab.system.base.BaseService;
 import top.codecrab.system.service.PermissionService;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author codecrab
@@ -27,16 +26,30 @@ import java.util.Optional;
 public class PermissionServiceImpl extends BaseService implements PermissionService {
 
     @Override
-    public List<Permission> findAll(int type, String pid) {
+    public List<Permission> findAll(Integer type, String pid, Integer enVisible) {
 
         Specification<Permission> specification = ((root, query, criteriaBuilder) -> {
             List<Predicate> list = new ArrayList<>();
-            if (type != 0) {
-                list.add(criteriaBuilder.equal(root.get("type").as(Integer.class), type));
+            if (type != null) {
+                CriteriaBuilder.In<Object> in = criteriaBuilder.in(root.get("type"));
+                if (Constants.PY_ZERO == type) {
+                    in.value(1).value(2);
+                } else {
+                    in.value(type);
+                }
             }
 
-            if (StrUtil.isNotBlank(pid)) {
+            //不为空添加查询条件，为空则查询所有
+            if (StrUtil.equals(Constants.ZERO, pid)) {
+                //表示查询私有功能列表
                 list.add(criteriaBuilder.equal(root.get("parentId").as(String.class), pid));
+            } else if (StrUtil.isNotBlank(pid)) {
+                //表示查询指定的功能列表
+                list.add(criteriaBuilder.equal(root.get("parentId").as(String.class), pid));
+            }
+
+            if (enVisible != null) {
+                list.add(criteriaBuilder.equal(root.get("enVisible").as(Integer.class), enVisible));
             }
 
             return criteriaBuilder.and(list.toArray(new Predicate[0]));
@@ -46,41 +59,42 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
     }
 
     @Override
-    public Object findById(String id) {
+    public Map<String, Object> findById(String id) {
         Optional<Permission> optional = permissionRepository.findById(id);
         if (optional.isEmpty()) {
-            return new Permission();
+            return null;
         }
         Permission permission = optional.get();
+        Map<String, Object> permissionMap = BeanUtil.beanToMap(permission);
+
+        Object obj;
         Integer type = permission.getType();
-        switch (type) {
-            case Constants.PY_MENU:
-                Optional<PermissionMenu> menuOptional = permissionMenuRepository.findById(id);
-                if (menuOptional.isEmpty()) {
-                    return new PermissionMenu();
-                }
-                PermissionMenu menu = menuOptional.get();
-                BeanUtil.copyProperties(permission, menu);
-                return menu;
-            case Constants.PY_POINT:
-                Optional<PermissionPoint> pointOptional = permissionPointRepository.findById(id);
-                if (pointOptional.isEmpty()) {
-                    return new PermissionPoint();
-                }
-                PermissionPoint point = pointOptional.get();
-                BeanUtil.copyProperties(permission, point);
-                return point;
-            case Constants.PY_API:
-                Optional<PermissionApi> apiOptional = permissionApiRepository.findById(id);
-                if (apiOptional.isEmpty()) {
-                    return new PermissionApi();
-                }
-                PermissionApi api = apiOptional.get();
-                BeanUtil.copyProperties(permission, api);
-                return api;
-            default:
-                return permission;
+        if (Constants.PY_MENU == type) {
+            Optional<PermissionMenu> menuOptional = permissionMenuRepository.findById(id);
+            if (menuOptional.isEmpty()) {
+                //所对应的具体的子权限为空，则直接返回权限信息
+                return permissionMap;
+            }
+            obj = menuOptional.get();
+        } else if (Constants.PY_POINT == type) {
+            Optional<PermissionPoint> pointOptional = permissionPointRepository.findById(id);
+            if (pointOptional.isEmpty()) {
+                return permissionMap;
+            }
+            obj = pointOptional.get();
+        } else if (Constants.PY_API == type) {
+            Optional<PermissionApi> apiOptional = permissionApiRepository.findById(id);
+            if (apiOptional.isEmpty()) {
+                return permissionMap;
+            }
+            obj = apiOptional.get();
+        } else {
+            return permissionMap;
         }
+
+        Map<String, Object> objectMap = BeanUtil.beanToMap(obj);
+        permissionMap.putAll(objectMap);
+        return permissionMap;
     }
 
     @Override
@@ -151,20 +165,37 @@ public class PermissionServiceImpl extends BaseService implements PermissionServ
         if (optional.isEmpty()) {
             return;
         }
-        Integer type = optional.get().getType();
-        switch (type) {
-            case Constants.PY_MENU:
-                permissionMenuRepository.deleteById(id);
-                break;
-            case Constants.PY_POINT:
-                permissionPointRepository.deleteById(id);
-                break;
-            case Constants.PY_API:
-                permissionApiRepository.deleteById(id);
-                break;
-            default:
-                throw new RuntimeException("权限实体类未知的type类型");
+        Permission permission = optional.get();
+
+        List<Permission> permissions = permissionRepository.findAllByParentId(id);
+        Set<String> set = new HashSet<>();
+        set.add(id);
+        while (permissions.size() > 0) {
+            Set<String> ids = permissions.stream().map(Permission::getId).collect(Collectors.toSet());
+            permissions = permissionRepository.findAllByParentIdIn(ids);
+            set.addAll(ids);
         }
-        permissionRepository.deleteById(id);
+        permissionRepository.deleteAllByIdIn(set);
+
+        int size = set.size();
+        if (size == 1) {
+            switch (permission.getType()) {
+                case Constants.PY_MENU:
+                    permissionMenuRepository.deleteAllByIdIn(set);
+                    break;
+                case Constants.PY_POINT:
+                    permissionPointRepository.deleteAllByIdIn(set);
+                    break;
+                case Constants.PY_API:
+                    permissionApiRepository.deleteAllByIdIn(set);
+                    break;
+                default:
+                    throw new RuntimeException("权限实体类未知的type类型");
+            }
+        } else if (size > 1) {
+            permissionMenuRepository.deleteAllByIdIn(set);
+            permissionPointRepository.deleteAllByIdIn(set);
+            permissionApiRepository.deleteAllByIdIn(set);
+        }
     }
 }

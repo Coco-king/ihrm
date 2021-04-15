@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import top.codecrab.common.config.Constants;
 import top.codecrab.common.entity.system.Role;
 import top.codecrab.common.entity.system.User;
 import top.codecrab.system.base.BaseService;
@@ -41,7 +42,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             }
 
             if (StrUtil.isNotBlank(hasDept)) {
-                if (ZERO.equals(hasDept)) {
+                if (Constants.ZERO.equals(hasDept)) {
                     // 表示部门未分配
                     list.add(criteriaBuilder.isNull(root.get("departmentId")));
                 } else {
@@ -64,12 +65,11 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void save(User user) {
+    public User save(User user) {
         user.setId(idWorker.nextId().toString());
         user.setEnableState(1);
-        user.setPassword("123456");
         user.setCreateTime(new Date());
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -138,5 +138,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         user.setEnableState(user.getEnableState().equals(0) ? 1 : 0);
         userRepository.saveAndFlush(user);
         return true;
+    }
+
+    @Override
+    public User findByMobile(String mobile) {
+        return userRepository.findByMobile(mobile);
     }
 }

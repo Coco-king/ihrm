@@ -1,6 +1,7 @@
 package top.codecrab.company.service.impl;
 
 import org.springframework.stereotype.Service;
+import top.codecrab.common.config.Constants;
 import top.codecrab.common.entity.company.Department;
 import top.codecrab.company.base.BaseService;
 import top.codecrab.company.service.DepartmentService;
@@ -52,7 +53,7 @@ public class DepartmentServiceImpl extends BaseService implements DepartmentServ
     @Override
     @Transactional(rollbackOn = Exception.class)
     public int delete(String id) {
-        if (NULL.equals(id)) {
+        if (Constants.ZERO.equals(id)) {
             long count = departmentRepository.count();
             departmentRepository.deleteAll();
             return (int) count;

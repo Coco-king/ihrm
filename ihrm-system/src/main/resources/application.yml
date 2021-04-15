@@ -12,3 +12,15 @@ spring:
     show-sql: true
     database: mysql
     open-in-view: true
+jwt:
+  config:
+    privateKey: ihrm@Login(Auth}*^31)&codecrab%
+    # 过期时间，单位分钟
+    expireTime: 60
+ihrm:
+  sms:
+    accessKeyId: LTAI5tFqSMAMBEHf49KniDk7 # 你自己的accessKeyId
+    accessKeySecret: 3CL2NgyJBUYr7Dm1QUtfNkzIAib1JB # 你自己的AccessKeySecret
+    signName: 南浔北觅 # 签名名称
+    verifyCodeTemplate: SMS_209470294 # 模板名称
+

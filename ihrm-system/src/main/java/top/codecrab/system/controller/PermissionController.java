@@ -22,12 +22,13 @@ public class PermissionController extends BaseController {
      * 分页查询角色
      */
     @GetMapping
-    public Result findByPage(
-            @RequestParam(defaultValue = "0") int type,
-            @RequestParam(defaultValue = "") String pid
+    public Result findAll(
+            @RequestParam(required = false) Integer type,
+            @RequestParam(defaultValue = "") String pid,
+            @RequestParam(required = false) Integer enVisible
     ) {
-        List<Permission> searchPage = permissionService.findAll(type, pid);
-        return new Result(ResultCode.SUCCESS, searchPage);
+        List<Permission> permissions = permissionService.findAll(type, pid, enVisible);
+        return new Result(ResultCode.SUCCESS, permissions);
     }
 
     /**

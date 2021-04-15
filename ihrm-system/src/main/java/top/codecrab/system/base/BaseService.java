@@ -9,10 +9,6 @@ import top.codecrab.system.repository.*;
  * @since 2021年04月09日 11:16
  */
 public class BaseService {
-
-    protected static final String NULL = "null";
-    protected static final String ZERO = "0";
-
     @Autowired
     protected IdWorker idWorker;
     @Autowired

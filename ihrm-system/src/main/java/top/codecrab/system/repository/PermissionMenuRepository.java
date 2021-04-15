@@ -9,4 +9,12 @@ import top.codecrab.common.entity.system.PermissionMenu;
  * @since 2021年04月13日 14:57
  */
 public interface PermissionMenuRepository extends JpaRepository<PermissionMenu, String>, JpaSpecificationExecutor<PermissionMenu> {
+
+    /**
+     * 根据id列表删除对应的记录
+     *
+     * @param ids id列表
+     */
+    void deleteAllByIdIn(Iterable<String> ids);
+
 }

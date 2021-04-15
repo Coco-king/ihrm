@@ -15,11 +15,12 @@ public interface PermissionService {
     /**
      * 查询所有权限
      *
-     * @param type 企业id
-     * @param pid  父级d
+     * @param type      企业id
+     * @param pid       父级d
+     * @param enVisible 企业可见性
      * @return 权限列表
      */
-    List<Permission> findAll(int type, String pid);
+    List<Permission> findAll(Integer type, String pid, Integer enVisible);
 
     /**
      * 根据id查询权限

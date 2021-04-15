@@ -42,8 +42,9 @@ public interface UserService {
      * 保存用户
      *
      * @param user 用户
+     * @return 保存后的用户
      */
-    void save(User user);
+    User save(User user);
 
     /**
      * 根据id修改用户
@@ -75,4 +76,12 @@ public interface UserService {
      * @return 是否成功
      */
     boolean toggleStatus(String id);
+
+    /**
+     * 根据手机号查询用户
+     *
+     * @param mobile 手机号
+     * @return 用户
+     */
+    User findByMobile(String mobile);
 }
