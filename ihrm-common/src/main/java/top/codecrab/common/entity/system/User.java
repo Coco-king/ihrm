@@ -98,6 +98,11 @@ public class User implements Serializable {
     private String departmentName;
 
     /**
+     * 用户等级
+     */
+    private String level;
+
+    /**
      * 用户与角色   多对多
      */
     @ManyToMany

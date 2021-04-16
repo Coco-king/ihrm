@@ -1,16 +1,22 @@
 package top.codecrab.system.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.aliyuncs.exceptions.ClientException;
 import org.springframework.web.bind.annotation.*;
+import top.codecrab.common.config.Constants;
+import top.codecrab.common.entity.system.Permission;
+import top.codecrab.common.entity.system.ProfileResult;
+import top.codecrab.common.entity.system.Role;
 import top.codecrab.common.entity.system.User;
 import top.codecrab.common.response.Result;
 import top.codecrab.system.base.BaseController;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +26,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/frame")
-public class LoginController extends BaseController {
+public class FrameController extends BaseController {
 
     private final String prefix = "USER_CODE:";
 
@@ -37,12 +43,43 @@ public class LoginController extends BaseController {
             return Result.fail("用户名或密码错误");
         }
 
+        StringBuilder sb = new StringBuilder();
+        //获取用户的权限
+        for (Role role : user.getRoles()) {
+            for (Permission permission : role.getPermissions()) {
+                if (permission.getType() == Constants.PY_API) {
+                    sb.append(permission.getCode()).append(",");
+                }
+            }
+        }
+
         Map<String, Object> params = new HashMap<>(16);
+        params.put("apis", sb.toString());
         params.put("companyId", user.getCompanyId());
         params.put("companyName", user.getCompanyName());
 
         String token = jwtUtils.generateToken(user.getId(), user.getUsername(), params);
-        return Result.success(token);
+        return Result.success(MapUtil.of("token", token));
+    }
+
+    @PostMapping("/profile")
+    public Result profile() {
+        String userId = claims.getId();
+        User user = userService.findById(userId);
+        ProfileResult profileResult;
+
+        //根据不同的level构建不同的数据
+        if (Constants.SASS_USER.equals(user.getLevel())) {
+            profileResult = new ProfileResult(user);
+        } else {
+            Integer enVisible = null;
+            if (Constants.CO_ADMIN.equals(user.getLevel())) {
+                enVisible = 1;
+            }
+            List<Permission> permissions = permissionService.findAll(null, null, enVisible);
+            profileResult = new ProfileResult(user, permissions);
+        }
+        return Result.success(profileResult);
     }
 
     @PostMapping("/register/verification_code")

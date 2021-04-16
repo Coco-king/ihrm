@@ -1,8 +1,5 @@
-package top.codecrab.common.test;
-import java.util.HashSet;
-import top.codecrab.common.entity.system.Role;
+package top.codecrab.system.test;
 
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -54,13 +51,14 @@ public class JwtTest {
 
     @Test
     void testParserToken() {
-        String token = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI2NjYiLCJzdWIiOiLlsI_mmI4iLCJpYXQiOjE2MTg0NzE5NjYsInVzZXIiOnsiaWQiOiJhc2QiLCJtb2JpbGUiOiJhc2QiLCJ1c2VybmFtZSI6ImFzZCIsInBhc3N3b3JkIjoiYXNkIiwiZW5hYmxlU3RhdGUiOjAsImNyZWF0ZVRpbWUiOjE2MTg0NzE5NjU4ODQsImNvbXBhbnlJZCI6ImFzZCIsImNvbXBhbnlOYW1lIjoiYXNkIiwiZGVwYXJ0bWVudElkIjoiYXNkIiwidGltZU9mRW50cnkiOjE2MTg0NzE5NjU4ODQsImZvcm1PZkVtcGxveW1lbnQiOjAsIndvcmtOdW1iZXIiOiJhc2QiLCJmb3JtT2ZNYW5hZ2VtZW50IjoiYXNkIiwid29ya2luZ0NpdHkiOiJhc2QiLCJjb3JyZWN0aW9uVGltZSI6MTYxODQ3MTk2NTg4NCwiaW5TZXJ2aWNlU3RhdHVzIjowLCJkZXBhcnRtZW50TmFtZSI6ImFzZCJ9fQ.mz0_pMbxPAICS7E2wCRTSEaSevNEj-PSoABH8YLgybo";
+        String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLnjovliJoiLCJjb21wYW55SWQiOiJ1c2VyLmdldENvbXBhbnlJZCgpIiwiY29tcGFueU5hbWUiOiJ1c2VyLmdldENvbXBhbnlOYW1lKCkiLCJleHAiOjE2MTg1NDQ4NjAsImlhdCI6MTYxODU0MTI2MCwianRpIjoiMjI4NDY5NTU2Mzg5NDc4NCJ9.9BlSte-EjYzeL6I1WIUEgUXLVcQvTYC6XmjR_jMxpJI";
 
-        Claims claims = Jwts.parser().setSigningKey("codecrab").parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey("ihrm@Login(Auth}*^31)&codecrab%").parseClaimsJws(token).getBody();
 
         System.out.println(claims.getId());
         System.out.println(claims.getSubject());
-        System.out.println(claims.get("user"));
+        System.out.println(claims.get("companyId"));
+        System.out.println(claims.get("companyName"));
         System.out.println(DateUtil.format(claims.getIssuedAt(), Constants.DATE_PATTERN));
     }
 }

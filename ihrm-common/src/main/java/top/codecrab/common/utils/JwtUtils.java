@@ -34,9 +34,10 @@ public class JwtUtils {
         long expire = (expireTime * 60000) + System.currentTimeMillis();
         // 生成token
         return Jwts.builder()
+                // setClaims必须放在第一行，否则会覆盖之前设置的数据
+                .setClaims(params)
                 .setId(id)
                 .setSubject(name)
-                .setClaims(params)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(expire))
                 .signWith(SignatureAlgorithm.HS256, privateKey)

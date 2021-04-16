@@ -11,10 +11,8 @@ import top.codecrab.common.response.Result;
 import top.codecrab.common.response.ResultCode;
 import top.codecrab.system.base.BaseController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -63,8 +61,11 @@ public class RoleController extends BaseController {
     @GetMapping("/{id}")
     public Result findById(@PathVariable(name = "id") String id) {
         Role role = roleService.findById(id);
-        //由于前端需要默认显示已经拥有的权限，需要已经拥有的权限id列表，在这里构建
-        List<String> ids = role.getPermissions().stream().map(Permission::getId).collect(Collectors.toList());
+        //由于前端需要默认显示已经拥有的权限，需要已经拥有的权限id列表，并过滤掉父id为0的。在这里构建
+        List<String> ids = role.getPermissions().stream()
+                //父id不为0才可以通行
+                .filter(permission -> !"0".equals(permission.getParentId()))
+                .map(Permission::getId).collect(Collectors.toList());
         return new InnerResult<>(ResultCode.SUCCESS, role, ids);
     }
 

@@ -68,6 +68,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     public User save(User user) {
         user.setId(idWorker.nextId().toString());
         user.setEnableState(1);
+        user.setTimeOfEntry(new Date());
         user.setCreateTime(new Date());
         return userRepository.save(user);
     }

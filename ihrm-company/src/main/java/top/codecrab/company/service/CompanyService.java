@@ -1,7 +1,6 @@
 package top.codecrab.company.service;
 
 import top.codecrab.common.entity.company.Company;
-import top.codecrab.common.response.Result;
 
 import java.util.List;
 

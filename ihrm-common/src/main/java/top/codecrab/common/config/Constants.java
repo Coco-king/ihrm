@@ -35,4 +35,24 @@ public class Constants {
      * 时间格式化格式
      */
     public static final String DATE_PATTERN = "yyyy年MM月dd日 HH:mm:ss";
+
+    /**
+     * saas管理员
+     */
+    public static final String SASS_ADMIN = "saasAdmin";
+
+    /**
+     * 企业管理员
+     */
+    public static final String CO_ADMIN = "coAdmin";
+
+    /**
+     * 普通用户
+     */
+    public static final String SASS_USER = "user";
+
+    /**
+     * 普通用户
+     */
+    public static final String TOKEN_PREFIX = "Bearer ";
 }

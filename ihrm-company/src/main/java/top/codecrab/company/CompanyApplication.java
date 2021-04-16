@@ -3,11 +3,6 @@ package top.codecrab.company;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.Bean;
-import top.codecrab.common.utils.IdWorker;
-
-import javax.annotation.PostConstruct;
-import java.util.TimeZone;
 
 /**
  * EntityScan注解：配置jpa注解扫描
