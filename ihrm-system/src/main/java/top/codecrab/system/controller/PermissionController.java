@@ -21,7 +21,7 @@ public class PermissionController extends BaseController {
     /**
      * 分页查询角色
      */
-    @GetMapping
+    @RequestMapping(method = RequestMethod.GET)
     public Result findAll(
             @RequestParam(required = false) Integer type,
             @RequestParam(defaultValue = "") String pid,
@@ -34,19 +34,19 @@ public class PermissionController extends BaseController {
     /**
      * 根据ID获取角色信息
      */
-    @GetMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Result findById(@PathVariable(name = "id") String id) {
         Object permission = permissionService.findById(id);
         return new Result(ResultCode.SUCCESS, permission);
     }
 
-    @PostMapping
+    @RequestMapping(method = RequestMethod.POST)
     public Result save(@RequestBody Map<String, Object> map) {
         permissionService.save(map);
         return Result.success();
     }
 
-    @PutMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Result update(
             @PathVariable(name = "id") String id,
             @RequestBody Map<String, Object> map
@@ -56,7 +56,7 @@ public class PermissionController extends BaseController {
         return update ? Result.success() : Result.fail();
     }
 
-    @DeleteMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public Result delete(@PathVariable(name = "id") String id) {
         permissionService.delete(id);
         return Result.success();

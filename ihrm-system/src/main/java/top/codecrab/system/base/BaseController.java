@@ -1,10 +1,11 @@
 package top.codecrab.system.base;
 
-import io.jsonwebtoken.Claims;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import top.codecrab.common.config.Constants;
 import top.codecrab.common.config.SmsProperties;
+import top.codecrab.common.entity.system.ProfileResult;
 import top.codecrab.common.utils.JwtUtils;
 import top.codecrab.common.utils.SmsUtils;
 import top.codecrab.system.service.PermissionService;
@@ -19,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2021年04月09日 9:29
  */
 public class BaseController {
-
-    protected Claims claims;
 
     @Autowired
     protected HttpServletRequest request;
@@ -41,12 +40,13 @@ public class BaseController {
 
     @ModelAttribute
     public void setAttribute() {
-        Object obj = request.getAttribute("user_claims");
+
+        Object obj = SecurityUtils.getSubject().getPrincipal();
 
         if (obj != null) {
-            this.claims = (Claims) obj;
-            Constants.COMPANY_ID = (String) claims.get("companyId");
-            Constants.COMPANY_NAME = (String) claims.get("companyName");
+            ProfileResult profileResult = (ProfileResult) obj;
+            Constants.COMPANY_ID = profileResult.getCompanyId();
+            Constants.COMPANY_NAME = profileResult.getCompanyName();
         }
     }
 }

@@ -1,5 +1,6 @@
 package top.codecrab.common.handler;
 
+import org.apache.shiro.authz.AuthorizationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,5 +32,12 @@ public class BaseExceptionHandler {
         } else {
             return new Result(ResultCode.SERVER_ERROR);
         }
+    }
+
+    @ResponseBody
+    @ExceptionHandler(value = AuthorizationException.class)
+    public Result error(HttpServletRequest request, HttpServletResponse response, AuthorizationException e) {
+        e.printStackTrace();
+        return new Result(ResultCode.UNAUTHORISED);
     }
 }

@@ -1,6 +1,7 @@
 package top.codecrab.system.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -68,6 +69,9 @@ public class UserServiceImpl extends BaseService implements UserService {
     public User save(User user) {
         user.setId(idWorker.nextId().toString());
         user.setEnableState(1);
+        user.setLevel("user");
+        user.setPassword("111111");
+        user.setPassword(new Md5Hash(user.getPassword(), user.getMobile(), 3).toString());
         user.setTimeOfEntry(new Date());
         user.setCreateTime(new Date());
         return userRepository.save(user);

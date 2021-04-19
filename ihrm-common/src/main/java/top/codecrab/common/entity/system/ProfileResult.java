@@ -2,6 +2,7 @@ package top.codecrab.common.entity.system;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -9,19 +10,24 @@ import java.util.*;
  * @since 2021年04月16日 9:57
  */
 @Data
-public class ProfileResult {
+public class ProfileResult implements Serializable {
+
+    private String id = "49908100275429716";
 
     private String mobile;
 
-    private String company;
+    private String companyId;
+
+    private String companyName;
 
     private String username;
 
-    private Map<String, Object> roles = new HashMap<>();
+    private Map<String, Set<String>> roles = new HashMap<>();
 
     public ProfileResult(User user) {
         this.mobile = user.getMobile();
-        this.company = user.getCompanyName();
+        this.companyId = user.getCompanyId();
+        this.companyName = user.getCompanyName();
         this.username = user.getUsername();
 
         Set<String> menus = new HashSet<>();
@@ -48,7 +54,8 @@ public class ProfileResult {
 
     public ProfileResult(User user, List<Permission> permissions) {
         this.mobile = user.getMobile();
-        this.company = user.getCompanyName();
+        this.companyId = user.getCompanyId();
+        this.companyName = user.getCompanyName();
         this.username = user.getUsername();
 
         Set<String> menus = new HashSet<>();

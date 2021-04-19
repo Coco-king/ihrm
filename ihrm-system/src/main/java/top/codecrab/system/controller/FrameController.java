@@ -5,18 +5,18 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.aliyuncs.exceptions.ClientException;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.subject.Subject;
 import org.springframework.web.bind.annotation.*;
-import top.codecrab.common.config.Constants;
-import top.codecrab.common.entity.system.Permission;
 import top.codecrab.common.entity.system.ProfileResult;
-import top.codecrab.common.entity.system.Role;
 import top.codecrab.common.entity.system.User;
 import top.codecrab.common.response.Result;
 import top.codecrab.system.base.BaseController;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,59 +30,37 @@ public class FrameController extends BaseController {
 
     private final String prefix = "USER_CODE:";
 
-    @PostMapping("/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public Result login(@RequestBody Map<String, String> map) {
         String mobile = map.get("mobile");
         String password = map.get("password");
-        if (StrUtil.isBlank(password)) {
-            return Result.fail("密码不能为空");
+        if (StrUtil.hasBlank(password, mobile)) {
+            return Result.fail("密码或手机号不能为空");
         }
 
-        User user = userService.findByMobile(mobile);
-        if (user == null || !password.equals(user.getPassword())) {
+        try {
+            //此处需要先把密码加密之后传过去才可以
+            password = new Md5Hash(password, mobile, 3).toString();
+            UsernamePasswordToken token = new UsernamePasswordToken(mobile, password);
+            Subject subject = SecurityUtils.getSubject();
+            subject.login(token);
+            String sessionId = (String) subject.getSession().getId();
+            return Result.success(MapUtil.of("token", sessionId));
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
             return Result.fail("用户名或密码错误");
         }
-
-        StringBuilder sb = new StringBuilder();
-        //获取用户的权限
-        for (Role role : user.getRoles()) {
-            for (Permission permission : role.getPermissions()) {
-                if (permission.getType() == Constants.PY_API) {
-                    sb.append(permission.getCode()).append(",");
-                }
-            }
-        }
-
-        Map<String, Object> params = new HashMap<>(16);
-        params.put("apis", sb.toString());
-        params.put("companyId", user.getCompanyId());
-        params.put("companyName", user.getCompanyName());
-
-        String token = jwtUtils.generateToken(user.getId(), user.getUsername(), params);
-        return Result.success(MapUtil.of("token", token));
     }
 
-    @PostMapping("/profile")
-    public Result profile() {
-        String userId = claims.getId();
-        User user = userService.findById(userId);
-        ProfileResult profileResult;
 
-        //根据不同的level构建不同的数据
-        if (Constants.SASS_USER.equals(user.getLevel())) {
-            profileResult = new ProfileResult(user);
-        } else {
-            Integer enVisible = null;
-            if (Constants.CO_ADMIN.equals(user.getLevel())) {
-                enVisible = 1;
-            }
-            List<Permission> permissions = permissionService.findAll(null, null, enVisible);
-            profileResult = new ProfileResult(user, permissions);
-        }
+    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+    public Result profile() {
+        //获取shiro的安全数据
+        ProfileResult profileResult = (ProfileResult) SecurityUtils.getSubject().getPrincipal();
         return Result.success(profileResult);
     }
 
-    @PostMapping("/register/verification_code")
+    @RequestMapping(value = "/register/verification_code", method = RequestMethod.POST)
     public Result verificationCode(@RequestBody Map<String, String> phone) {
         String mobile = phone.get("mobile");
         if (StrUtil.isBlank(mobile)) {
@@ -103,7 +81,7 @@ public class FrameController extends BaseController {
         return new Result(10000, "发送验证码成功", true);
     }
 
-    @PostMapping("/register/step1")
+    @RequestMapping(value = "/register/step1", method = RequestMethod.POST)
     public Result step1(@RequestBody Map<String, String> map) {
         String mobile = map.get("mobile");
         String verificationCode = map.get("verificationCode");
@@ -123,7 +101,7 @@ public class FrameController extends BaseController {
         return new Result(10000, mobile, true);
     }
 
-    @PostMapping("/register/step2")
+    @RequestMapping(value = "/register/step2", method = RequestMethod.POST)
     public Result step2(@RequestBody Map<String, String> map) {
         User user1 = BeanUtil.toBean(map, User.class);
 

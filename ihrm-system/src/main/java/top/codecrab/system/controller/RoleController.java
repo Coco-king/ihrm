@@ -26,20 +26,20 @@ public class RoleController extends BaseController {
     /**
      * 查询角色
      */
-    @GetMapping("/findAll")
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public Result findAll() {
         List<Role> roles = roleService.findAll();
         return new Result(ResultCode.SUCCESS, roles);
     }
 
-    @PostMapping
+    @RequestMapping(method = RequestMethod.POST)
     public Result add(@RequestBody Role role) {
         role.setCompanyId(Constants.COMPANY_ID);
         roleService.save(role);
         return Result.success();
     }
 
-    @PutMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Result update(
             @PathVariable(name = "id") String id,
             @RequestBody Role role
@@ -49,7 +49,7 @@ public class RoleController extends BaseController {
         return update ? Result.success() : Result.fail();
     }
 
-    @DeleteMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public Result delete(@PathVariable(name = "id") String id) {
         roleService.delete(id);
         return Result.success();
@@ -58,7 +58,7 @@ public class RoleController extends BaseController {
     /**
      * 根据ID获取角色信息
      */
-    @GetMapping("/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Result findById(@PathVariable(name = "id") String id) {
         Role role = roleService.findById(id);
         //由于前端需要默认显示已经拥有的权限，需要已经拥有的权限id列表，并过滤掉父id为0的。在这里构建
@@ -72,7 +72,7 @@ public class RoleController extends BaseController {
     /**
      * 分页查询角色
      */
-    @GetMapping
+    @RequestMapping(method = RequestMethod.GET)
     public Result findByPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size
@@ -82,7 +82,7 @@ public class RoleController extends BaseController {
         return new Result(ResultCode.SUCCESS, pr);
     }
 
-    @PutMapping("/assignPrem")
+    @RequestMapping(value = "/assignPrem", method = RequestMethod.PUT)
     public Result assignPrem(@RequestBody Map<String, Object> map) {
         boolean assignPrem = roleService.assignPrem(map);
         return assignPrem ? Result.success() : Result.fail();

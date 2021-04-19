@@ -10,10 +10,10 @@ import top.codecrab.common.interceptor.JwtInterceptor;
  * @author codecrab
  * @since 2021年04月16日 17:28
  */
-@Configuration
+//@Configuration
 public class SystemConfig implements WebMvcConfigurer {
 
-    @Autowired
+   // @Autowired
     private JwtInterceptor jwtInterceptor;
 
     @Override
